@@ -137,7 +137,7 @@ def get_user_simple_by_id(user_id):
     try:
         conn = dbh()
         with conn.cursor() as c:
-            sql = "SELECT `id`, `account_name`, `address`. `null_sell_items` FROM `users` WHERE `id` = %s"
+            sql = "SELECT * FROM `users` WHERE `id` = %s"
             c.execute(sql, [user_id])
             user = c.fetchone()
             if user is None:
@@ -322,7 +322,7 @@ def get_new_items():
                 category = get_category_by_id(item["category_id"])
 
                 item["category"] = category
-                item["seller"] = seller
+                item["seller"] = to_user_json(seller)
                 item["image_url"] = get_image_url(item["image_name"])
                 item = to_item_json(item, simple=True)
 
@@ -405,7 +405,7 @@ def get_new_category_items(root_category_id=None):
                 category = get_category_by_id(item["category_id"])
 
                 item["category"] = category
-                item["seller"] = seller
+                item["seller"] = to_user_json(seller)
                 item["image_url"] = get_image_url(item["image_name"])
                 item = to_item_json(item, simple=True)
 
@@ -478,7 +478,7 @@ def get_transactions():
                 category = get_category_by_id(item["category_id"])
 
                 item["category"] = category
-                item["seller"] = seller
+                item["seller"] = to_user_json(seller)
                 item["image_url"] = get_image_url(item["image_name"])
                 item = to_item_json(item, simple=False)
 
@@ -570,7 +570,7 @@ def get_user_items(user_id=None):
                 category = get_category_by_id(item["category_id"])
 
                 item["category"] = category
-                item["seller"] = seller
+                item["seller"] = to_user_json(seller)
                 item["image_url"] = get_image_url(item["image_name"])
                 item = to_item_json(item, simple=True)
                 item_simples.append(item)
@@ -585,7 +585,7 @@ def get_user_items(user_id=None):
         item_simples = item_simples[:Constants.ITEMS_PER_PAGE]
 
     return flask.jsonify(dict(
-        user=user,
+        user=to_user_json(user),
         items=item_simples,
         has_next=has_next,
     ))
@@ -608,7 +608,7 @@ def get_item(item_id=None):
             category = get_category_by_id(item["category_id"])
 
             item["category"] = category
-            item["seller"] = seller
+            item["seller"] = to_user_json(seller)
             item["image_url"] = get_image_url(item["image_name"])
             item = to_item_json(item, simple=False)
 
