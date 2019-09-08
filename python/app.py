@@ -133,6 +133,24 @@ def get_user_or_none():
     return user
 
 
+def get_user_map():
+    users_dict = {}
+    try:
+        conn = dbh()
+        with conn.cursor() as c:
+            sql = "SELECT `id`, `account_name`, `address`, `num_sell_items` FROM `users`"
+            c.execute(sql)
+            users = c.fetchall()
+
+            for user in users:
+                users_dict[user['id']] = user
+                if user is None:
+                    http_json_error(requests.codes['not_found'], "user not found")
+    except MySQLdb.Error as err:
+        app.logger.exception(err)
+        http_json_error(requests.codes['internal_server_error'], "db error")
+    return users_dict
+
 def get_user_simple_by_id(user_id):
     try:
         conn = dbh()
@@ -473,8 +491,9 @@ def get_transactions():
 
             item_details = []
             items = c.fetchall()
+            users_dict = get_user_map()
             for item in items:
-                seller = get_user_simple_by_id(item["seller_id"])
+                seller = users_dict["seller_id"]
                 category = get_category_by_id(item["category_id"])
 
                 item["category"] = category
