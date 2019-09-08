@@ -178,6 +178,10 @@ def get_category_map():
                 category_dict[category['id']] = category
                 if category is None:
                     http_json_error(requests.codes['not_found'], "user not found")
+                if category['parent_id'] != 0:
+                    parent = get_category_by_id(category['parent_id'])
+                    if parent is not None:
+                        category['parent_category_name'] = parent['category_name']
     except MySQLdb.Error as err:
         app.logger.exception(err)
         http_json_error(requests.codes['internal_server_error'], "db error")
