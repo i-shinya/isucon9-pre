@@ -137,7 +137,7 @@ def get_user_simple_by_id(user_id):
     try:
         conn = dbh()
         with conn.cursor() as c:
-            sql = "SELECT `id`, `account_name`, `address`. `null_sell_items` FROM `users` WHERE `id` = %s"
+            sql = "SELECT `id`, `account_name`, `address`, `null_sell_items` FROM `users` WHERE `id` = %s"
             c.execute(sql, [user_id])
             user = c.fetchone()
             if user is None:
