@@ -170,7 +170,9 @@ def get_category_map():
     try:
         conn = dbh()
         with conn.cursor() as c:
-            categorys = app.config['CATEGORY_MAP']
+            sql = "SELECT * FROM `categories`"
+            c.execute(sql)
+            categorys = c.fetchall()
 
             for category in categorys:
                 category_dict[category['id']] = category
@@ -301,16 +303,6 @@ def post_initialize():
                 shipment_service_url
             ))
             conn.commit()
-        except MySQLdb.Error as err:
-            conn.rollback()
-            app.logger.exception(err)
-            http_json_error(requests.codes['internal_server_error'], "db error")
-
-    with conn.cursor() as c2:
-        try:
-            sql = "SELECT * FROM `categories`"
-            c2.execute(sql)
-            app.config['CATEGORY_MAP'] = c2.fetchall()
         except MySQLdb.Error as err:
             conn.rollback()
             app.logger.exception(err)
