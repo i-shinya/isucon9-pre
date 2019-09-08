@@ -20,7 +20,7 @@ static_folder = base_path / 'public'
 app = flask.Flask(__name__, static_folder=str(static_folder), static_url_path='')
 app.config['SECRET_KEY'] = 'isucari'
 app.config['UPLOAD_FOLDER'] = '../public/upload'
-category_map = {}
+app.config['CATEGORY_MAP'] = {}
 
 class Constants(object):
     DEFAULT_PAYMENT_SERVICE_URL = "http://127.0.0.1:5555"
@@ -167,16 +167,22 @@ def get_user_simple_by_id(user_id):
 
 def get_category_map():
     category_dict = {}
-    categorys = category_map
+    try:
+        conn = dbh()
+        with conn.cursor() as c:
+            categorys = app.config['CATEGORY_MAP']
 
-    for category in categorys:
-        category_dict[category['id']] = category
-        if category is None:
-            http_json_error(requests.codes['not_found'], "user not found")
-        if category['parent_id'] != 0:
-            parent = get_category_by_id(category['parent_id'])
-            if parent is not None:
-                category['parent_category_name'] = parent['category_name']
+            for category in categorys:
+                category_dict[category['id']] = category
+                if category is None:
+                    http_json_error(requests.codes['not_found'], "user not found")
+                if category['parent_id'] != 0:
+                    parent = get_category_by_id(category['parent_id'])
+                    if parent is not None:
+                        category['parent_category_name'] = parent['category_name']
+    except MySQLdb.Error as err:
+        app.logger.exception(err)
+        http_json_error(requests.codes['internal_server_error'], "db error")
     return category_dict
 
 def get_category_by_id(category_id):
@@ -300,12 +306,11 @@ def post_initialize():
             app.logger.exception(err)
             http_json_error(requests.codes['internal_server_error'], "db error")
 
-    conn = dbh()
     with conn.cursor() as c2:
         try:
             sql = "SELECT * FROM `categories`"
             c2.execute(sql)
-            category_map = c2.fetchall()
+            app.config['CATEGORY_MAP'] = c2.fetchall()
         except MySQLdb.Error as err:
             conn.rollback()
             app.logger.exception(err)
