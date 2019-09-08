@@ -20,7 +20,6 @@ static_folder = base_path / 'public'
 app = flask.Flask(__name__, static_folder=str(static_folder), static_url_path='')
 app.config['SECRET_KEY'] = 'isucari'
 app.config['UPLOAD_FOLDER'] = '../public/upload'
-app.config['CATEGORY_MAP'] = {}
 
 class Constants(object):
     DEFAULT_PAYMENT_SERVICE_URL = "http://127.0.0.1:5555"
