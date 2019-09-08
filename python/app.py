@@ -615,7 +615,7 @@ def get_item(item_id=None):
             if (user["id"] == item["seller_id"] or user["id"] == item["buyer_id"]) and item["buyer_id"]:
                 buyer = get_user_simple_by_id(item["buyer_id"])
 
-                item["buyer"] = to_user_json(buyer)
+                item["buyer"] = buyer
                 item["buyer_id"] = buyer["id"]
 
                 sql = "SELECT * FROM `transaction_evidences` WHERE `item_id` = %s"
