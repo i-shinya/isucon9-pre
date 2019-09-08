@@ -480,12 +480,8 @@ def get_transactions():
                 ])
 
             item_details = []
-            while True:
-                item = c.fetchone()
-
-                if item is None:
-                    break
-
+            items = c.fetchall()
+            for item in items:
                 seller = get_user_simple_by_id(item["seller_id"])
                 category = get_category_by_id(item["category_id"])
 
