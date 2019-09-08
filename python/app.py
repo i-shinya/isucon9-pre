@@ -315,11 +315,8 @@ def get_new_items():
 
             item_simples = []
 
-            while True:
-                item = c.fetchone()
-
-                if item is None:
-                    break
+            items = c.fetchall()
+            for item in items:
 
                 seller = get_user_simple_by_id(item["seller_id"])
                 category = get_category_by_id(item["category_id"])
@@ -375,10 +372,8 @@ def get_new_category_items(root_category_id=None):
                 root_category_id,
             ))
 
-            while True:
-                category = c.fetchone()
-                if category is None:
-                    break
+            categorys = c.fetchall()
+            for category in categorys:
                 category_ids.append(category["id"])
 
             if item_id > 0 and created_at > 0:
@@ -403,11 +398,8 @@ def get_new_category_items(root_category_id=None):
                 ))
 
             item_simples = []
-            while True:
-                item = c.fetchone()
-
-                if item is None:
-                    break
+            items = c.fetchall()
+            for item in items:
 
                 seller = get_user_simple_by_id(item["seller_id"])
                 category = get_category_by_id(item["category_id"])
@@ -571,11 +563,8 @@ def get_user_items(user_id=None):
                 ))
 
             item_simples = []
-            while True:
-                item = c.fetchone()
-
-                if item is None:
-                    break
+            items = c.fetchall()
+            for item in items:
 
                 seller = get_user_simple_by_id(item["seller_id"])
                 category = get_category_by_id(item["category_id"])
