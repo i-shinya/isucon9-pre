@@ -20,7 +20,7 @@ static_folder = base_path / 'public'
 app = flask.Flask(__name__, static_folder=str(static_folder), static_url_path='')
 app.config['SECRET_KEY'] = 'isucari'
 app.config['UPLOAD_FOLDER'] = '../public/upload'
-
+app.config['CATEGORY_MAP'] = {}
 
 class Constants(object):
     DEFAULT_PAYMENT_SERVICE_URL = "http://127.0.0.1:5555"
@@ -170,9 +170,7 @@ def get_category_map():
     try:
         conn = dbh()
         with conn.cursor() as c:
-            sql = "SELECT * FROM `categories`"
-            c.execute(sql)
-            categorys = c.fetchall()
+            categorys = app.config['CATEGORY_MAP']
 
             for category in categorys:
                 category_dict[category['id']] = category
@@ -303,6 +301,16 @@ def post_initialize():
                 shipment_service_url
             ))
             conn.commit()
+        except MySQLdb.Error as err:
+            conn.rollback()
+            app.logger.exception(err)
+            http_json_error(requests.codes['internal_server_error'], "db error")
+
+    with conn.cursor() as c2:
+        try:
+            sql = "SELECT * FROM `categories`"
+            c2.execute(sql)
+            app.config['CATEGORY_MAP'] = c2.fetchall()
         except MySQLdb.Error as err:
             conn.rollback()
             app.logger.exception(err)
