@@ -173,6 +173,8 @@ def get_category_by_id(category_id):
         c.execute(sql, (category_id,))
         category = c.fetchone()
         # TODO: check err
+        if category is None:
+            http_json_error(requests.codes['not_found'], "category not found")
     if category['parent_id'] != 0:
         parent = get_category_by_id(category['parent_id'])
         if parent is not None:
