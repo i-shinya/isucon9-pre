@@ -1179,6 +1179,7 @@ def get_qrcode(transaction_evidence_id):
     return  res
 
 
+# XXX.直さない
 @app.route("/bump", methods=["POST"])
 def post_bump():
     ensure_valid_csrf_token()
@@ -1231,7 +1232,7 @@ def post_bump():
         'item_updated_at': int(target_item['updated_at'].timestamp()),
     })
 
-
+# XXX 直さない
 @app.route("/settings", methods=["GET"])
 def get_settings():
     outputs = dict()
@@ -1254,7 +1255,7 @@ def get_settings():
 
     return flask.jsonify(outputs)
 
-
+# XXX 直さない
 @app.route("/login", methods=["POST"])
 def post_login():
     ensure_required_payload(['account_name', 'password'])
@@ -1278,7 +1279,7 @@ def post_login():
         to_user_json(user),
     )
 
-
+# XXX 直さない
 @app.route("/register", methods=["POST"])
 def post_register():
     ensure_required_payload(['account_name', 'password', 'address'])
@@ -1302,7 +1303,7 @@ def post_register():
         'address': flask.request.json['address'],
     })
 
-
+# XXX 直さない
 @app.route("/reports.json", methods=["GET"])
 def get_reports():
     try:
