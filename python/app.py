@@ -70,10 +70,8 @@ def dbh():
     flask.g.db = MySQLdb.connect(
         host=os.getenv('MYSQL_HOST', '127.0.0.1'),
         port=int(os.getenv('MYSQL_PORT', 3306)),
-        #user=os.getenv('MYSQL_USER', 'isucari'),
-        user=os.getenv('MYSQL_USER', 'root'),
-        #password=os.getenv('MYSQL_PASS', 'isucari'),
-        password=os.getenv('MYSQL_PASS', 'Konohatyankawaii11'),
+        user=os.getenv('MYSQL_USER', 'isucari'),
+        password=os.getenv('MYSQL_PASS', 'isucari'),
         db=os.getenv('MYSQL_DBNAME', 'isucari'),
         charset='utf8mb4',
         cursorclass=MySQLdb.cursors.DictCursor,
