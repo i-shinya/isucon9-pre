@@ -70,8 +70,10 @@ def dbh():
     flask.g.db = MySQLdb.connect(
         host=os.getenv('MYSQL_HOST', '127.0.0.1'),
         port=int(os.getenv('MYSQL_PORT', 3306)),
-        user=os.getenv('MYSQL_USER', 'isucari'),
-        password=os.getenv('MYSQL_PASS', 'isucari'),
+        #user=os.getenv('MYSQL_USER', 'isucari'),
+        user=os.getenv('MYSQL_USER', 'root'),
+        #password=os.getenv('MYSQL_PASS', 'isucari'),
+        password=os.getenv('MYSQL_PASS', 'Konohatyankawaii11'),
         db=os.getenv('MYSQL_DBNAME', 'isucari'),
         charset='utf8mb4',
         cursorclass=MySQLdb.cursors.DictCursor,
@@ -336,9 +338,13 @@ def get_new_items():
             item_simples = []
 
             items = c.fetchall()
+
+            users_dict = get_user_map()
+
             for item in items:
 
-                seller = get_user_simple_by_id(item["seller_id"])
+                #seller = get_user_simple_by_id(item["seller_id"])
+                seller = users_dict[item["seller_id"]]
                 category = get_category_by_id(item["category_id"])
 
                 item["category"] = category
@@ -419,9 +425,11 @@ def get_new_category_items(root_category_id=None):
 
             item_simples = []
             items = c.fetchall()
+            users_dict = get_user_map()
             for item in items:
 
-                seller = get_user_simple_by_id(item["seller_id"])
+                seller = users_dict[item["seller_id"]]
+                #seller = get_user_simple_by_id(item["seller_id"])
                 category = get_category_by_id(item["category_id"])
 
                 item["category"] = category
@@ -495,7 +503,7 @@ def get_transactions():
             items = c.fetchall()
             users_dict = get_user_map()
             for item in items:
-                seller = users_dict["seller_id"]
+                seller = users_dict[item["seller_id"]]
                 category = get_category_by_id(item["category_id"])
 
                 item["category"] = category
@@ -585,9 +593,12 @@ def get_user_items(user_id=None):
 
             item_simples = []
             items = c.fetchall()
+            users_dict = get_user_map()
+
             for item in items:
 
-                seller = get_user_simple_by_id(item["seller_id"])
+                #seller = get_user_simple_by_id(item["seller_id"])
+                seller = users_dict[item["seller_id"]]
                 category = get_category_by_id(item["category_id"])
 
                 item["category"] = category
@@ -622,10 +633,12 @@ def get_item(item_id=None):
             sql = "SELECT * FROM `items` WHERE `id` = %s"
             c.execute(sql, (item_id,))
             item = c.fetchone()
+            users_dict = get_user_map()
             if item is None:
                 http_json_error(requests.codes['not_found'], "item not found")
 
-            seller = get_user_simple_by_id(item["seller_id"])
+            #seller = get_user_simple_by_id(item["seller_id"])
+            seller = users_dict[item["seller_id"]]
             category = get_category_by_id(item["category_id"])
 
             item["category"] = category
@@ -634,7 +647,8 @@ def get_item(item_id=None):
             item = to_item_json(item, simple=False)
 
             if (user["id"] == item["seller_id"] or user["id"] == item["buyer_id"]) and item["buyer_id"]:
-                buyer = get_user_simple_by_id(item["buyer_id"])
+                #buyer = get_user_simple_by_id(item["buyer_id"])
+                buyer = users_dict[item["buyer_id"]]
 
                 item["buyer"] = buyer
                 item["buyer_id"] = buyer["id"]
