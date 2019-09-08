@@ -246,7 +246,7 @@ def api_shipment_status(shipment_url, params={}):
         res.raise_for_status()
     except (socket.gaierror, requests.HTTPError) as err:
         app.logger.exception(err)
-        http_json_error(requests.codes['internal_server_error'])
+        http_json_error(requests.codes['internal_server_error'], "error")
 
     return res.json()
 
@@ -642,8 +642,8 @@ def get_item(item_id=None):
                 sql = "SELECT * FROM `transaction_evidences` WHERE `item_id` = %s"
                 c.execute(sql, (item['id'],))
                 transaction_evidence = c.fetchone()
-                # if not transaction_evidence:
-                #     http_json_error(requests.codes['not_found'], "transaction_evidence not found")
+                if not transaction_evidence:
+                    http_json_error(requests.codes['not_found'], "transaction_evidence not found")
 
 
                 sql = "SELECT * FROM `shippings` WHERE `transaction_evidence_id` = %s"
