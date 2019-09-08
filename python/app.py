@@ -165,20 +165,41 @@ def get_user_simple_by_id(user_id):
         http_json_error(requests.codes['internal_server_error'], "db error")
     return user
 
+def get_category_map():
+    category_dict = {}
+    try:
+        conn = dbh()
+        with conn.cursor() as c:
+            sql = "SELECT * FROM `categories`"
+            c.execute(sql)
+            categorys = c.fetchall()
+
+            for category in categorys:
+                category_dict[category['id']] = category
+                if category is None:
+                    http_json_error(requests.codes['not_found'], "user not found")
+    except MySQLdb.Error as err:
+        app.logger.exception(err)
+        http_json_error(requests.codes['internal_server_error'], "db error")
+    return category_dict
 
 def get_category_by_id(category_id):
     conn = dbh()
-    sql = "SELECT * FROM `categories` WHERE `id` = %s"
-    with conn.cursor() as c:
-        c.execute(sql, (category_id,))
-        category = c.fetchone()
-        # TODO: check err
-        if category is None:
-            http_json_error(requests.codes['not_found'], "category not found")
-    if category['parent_id'] != 0:
-        parent = get_category_by_id(category['parent_id'])
-        if parent is not None:
-            category['parent_category_name'] = parent['category_name']
+    try:
+        sql = "SELECT * FROM `categories` WHERE `id` = %s"
+        with conn.cursor() as c:
+            c.execute(sql, (category_id,))
+            category = c.fetchone()
+            # 解消済みTODO: check err
+            if category is None:
+                http_json_error(requests.codes['not_found'], "category not found")
+        if category['parent_id'] != 0:
+            parent = get_category_by_id(category['parent_id'])
+            if parent is not None:
+                category['parent_category_name'] = parent['category_name']
+    except MySQLdb.Error as err:
+        app.logger.exception(err)
+        http_json_error(requests.codes['internal_server_error'], "db error")
     return category
 
 
@@ -338,12 +359,13 @@ def get_new_items():
             items = c.fetchall()
 
             users_dict = get_user_map()
+            category_dict = get_category_map()
 
             for item in items:
 
                 #seller = get_user_simple_by_id(item["seller_id"])
                 seller = users_dict[item["seller_id"]]
-                category = get_category_by_id(item["category_id"])
+                category = category_dict[item["category_id"]]
 
                 item["category"] = category
                 item["seller"] = seller
@@ -424,11 +446,13 @@ def get_new_category_items(root_category_id=None):
             item_simples = []
             items = c.fetchall()
             users_dict = get_user_map()
+            category_dict = get_category_map()
             for item in items:
 
                 seller = users_dict[item["seller_id"]]
                 #seller = get_user_simple_by_id(item["seller_id"])
-                category = get_category_by_id(item["category_id"])
+                #category = get_category_by_id(item["category_id"])
+                category = category_dict[item["category_id"]]
 
                 item["category"] = category
                 item["seller"] = seller
@@ -500,9 +524,11 @@ def get_transactions():
             item_details = []
             items = c.fetchall()
             users_dict = get_user_map()
+            category_dict = get_category_map()
             for item in items:
                 seller = users_dict[item["seller_id"]]
-                category = get_category_by_id(item["category_id"])
+                #category = get_category_by_id(item["category_id"])
+                category = category_dict[item["category_id"]]
 
                 item["category"] = category
                 item["seller"] = seller
@@ -592,12 +618,13 @@ def get_user_items(user_id=None):
             item_simples = []
             items = c.fetchall()
             users_dict = get_user_map()
-
+            category_dict = get_category_map()
             for item in items:
 
                 #seller = get_user_simple_by_id(item["seller_id"])
                 seller = users_dict[item["seller_id"]]
-                category = get_category_by_id(item["category_id"])
+                #category = get_category_by_id(item["category_id"])
+                category = category_dict[item["category_id"]]
 
                 item["category"] = category
                 item["seller"] = seller
