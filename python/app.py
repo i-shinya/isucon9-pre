@@ -473,8 +473,22 @@ def get_transactions():
 
             item_details = []
             items = c.fetchall()
+
+            # sellerをとる
+            seller_ids = [item['seller_id'] for item in items]
+            sql = "SELECT * FROM `users` WHERE `id` IN %s"
+            c.execute(sql,(tuple(seller_ids),))
+            sellers = c.fetchall()
+
+            sellers_dict = {}
+            for seller in sellers:
+                sellers_dict[seller['id']] = seller
+
             for item in items:
-                seller = get_user_simple_by_id(item["seller_id"])
+                if not item["seller_id"] in sellers_dict:
+                    http_json_error(requests.codes['not_found'], "user not found")
+                seller = sellers_dict[item["seller_id"]]
+                # seller = get_user_simple_by_id(item["seller_id"])
                 category = get_category_by_id(item["category_id"])
 
                 item["category"] = category
